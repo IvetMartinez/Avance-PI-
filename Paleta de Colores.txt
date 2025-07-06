@@ -1,0 +1,5 @@
+#43b5e7 Azul Claro
+#f9fb1c Amarillo
+#5c4998 Morado
+#04aa3e Verde
+#294ca0 Azul
