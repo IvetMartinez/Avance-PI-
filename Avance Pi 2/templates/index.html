@@ -79,11 +79,13 @@
   </style>
 </head>
 
+
+
 <nav class="navbar navbar-expand-lg navbar-light navbar-custom">
   <div class="container">
 
     <a class="navbar-brand" href="#">
-      <img src="./img/QroHu2.png" alt="Logo" />
+      <img src="../static/QroHu2.png" alt="Logo" />
     </a>
 
     
@@ -92,10 +94,13 @@
 
 <body class="bg-light">
 
+  x
+
   <div class="container py-5">
     <h1 class="mb-4 text-center">Inicio</h1>
     <div class="row g-4 text-center">
       
+      <!-- Tarjetas del Inicio para seleccionar formulario -->
       <div class="col-md-3">
         
         <div class="card gradient-border" onclick="Vista('usuarios')">
@@ -135,12 +140,27 @@
 
     </div>
 
+    {% with mensajes = get_flashed_messages() %}
+      {% if mensajes %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {% for msj in mensajes %}
+            {{ msj }}
+          {% endfor %}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endif %}
+    {% endwith %}
+
+
+    <!-- Sección de formularios -->
+
+    <!-- Gestión de Usuarios -->
 
 <div id="usuarios" class="dashboard-section">
   <h3 class="mt-5">Gestión de Usuarios</h3>
 
   
-  <form class="row g-3 mt-3 mb-4">
+  <form class="row g-3 mt-3 mb-4" action="">
 
     
 
@@ -149,12 +169,39 @@
     </div>
 
     <div class="col-md-4">
-      <select class="form-select" required>
-        <option selected disabled>Tipo</option>
-        <option value="Premium">Premium</option>
-        <option value="Básico">Básico</option>
-      </select>
+      <input type="text" class="form-control" placeholder="Correo Electrónico" name="correo" required>
+
+      {% if errores and errores.correo %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.correo }}
+        </div>
+      {% endif %}
     </div>
+
+    <div class="col-md-4">
+      <input type="password" class="form-control" placeholder="Contraseña" name="contrasena" required>
+
+      {% if errores and errores.contrasena %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.contrasena }}
+        </div>
+      {% endif %}
+
+    </div>
+
+    <div class="col-md-4">
+      <input type="text" class="form-control" placeholder="Teléfono" name="telefono" required>
+
+      {% if errores and errores.telefono %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.telefono }}
+        </div>
+      {% endif %}
+
+    </div>
+
+
+    
 
     <div class="col-12">
       <button type="submit" class="btn btn-success">Agregar Usuario</button>
@@ -169,43 +216,73 @@
       <tr>
         <th>ID</th>
         <th>Nombre</th>
-        <th>Tipo</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
         <th>Acciones</th>
       </tr>
     </thead>
 
     <tbody>
+      {% for u in usuarios %}
+        <tr>
+          <td>{{u.0}}</td>
+          <td>{{u.1}}</td>
+          <td>{{u.2}}</td>
+          <td>{{u.4}}</td>
 
-      <tr>
-        <td>001</td>
-        <td>María López</td>
-        <td>Premium</td>
-        <td class="action-buttons">
-          <button class="btn btn-warning btn-sm">Editar</button>
-          <button class="btn btn-danger btn-sm">Eliminar</button>
-        </td>
-      </tr>
-
-    </tbody>
+          <td class="action-buttons">
+            <button class="btn btn-warning btn-sm">Editar</button>
+            <button class="btn btn-danger btn-sm">Eliminar</button>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
   </table>
 </div>
 
+<!-- Administradores Activos -->
 
 <div id="admins" class="dashboard-section">
   <h3 class="mt-5">Administradores Activos</h3>
 
 
-  <form class="row g-3 mt-3 mb-4">
+  <form class="row g-3 mt-3 mb-4" action="">
 
     
 
     <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Nombre" required>
+      <input type="text" class="form-control" placeholder="Nombre" name="nombre_admin" required>
+
+      {% if errores and errores.nombre_admin %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.nombre_admin }}
+        </div>
+      {% endif %}
+
     </div>
 
     <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Cargo" required>
+      <input type="text" class="form-control" placeholder="Correo Electrónico" name="correo_admin" required>
+
+      {% if errores and errores.correo_admin %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.correo_admin }}
+        </div>
+      {% endif %}
+
     </div>
+
+    <div class="col-md-4">
+      <input type="text" class="form-control" placeholder="Contraseña" name="contrasena_admin" required>
+
+      {% if errores and errores.contrasena_admin %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.contrasena_admin }}
+        </div>
+      {% endif %}
+
+    </div>
+
 
     <div class="col-12">
       <button type="submit" class="btn btn-success">Agregar Administrador</button>
@@ -220,6 +297,7 @@
       <tr>
         <th>ID</th>
         <th>Nombre</th>
+        <th>Correo</th>
         <th>Cargo</th>
         <th>Acciones</th>
       </tr>
@@ -227,58 +305,115 @@
     </thead>
 
     <tbody>
-
-      <tr>
-        <td>001</td>
-        <td>Carlos Méndez</td>
-        <td>Coordinador</td>
-        <td class="action-buttons">
-          <button class="btn btn-warning btn-sm">Editar</button>
-          <button class="btn btn-danger btn-sm">Eliminar</button>
-        </td>
-      </tr>
-
+      {% for admin in administradores%}
+        <tr>
+          <td>{{admin.0}}</td>
+          <td>{{admin.1}}</td>
+          <td>{{admin.2}}</td>
+          <td>{{admin.4}}</td>
+          <td class="action-buttons">
+            <button class="btn btn-warning btn-sm">Editar</button>
+            <button class="btn btn-danger btn-sm">Eliminar</button>
+          </td>
+        </tr>
+      {% endfor%}
     </tbody>
   </table>
 </div>
 
+<!-- Gestión de Semillas -->
 
 <div id="semillas" class="dashboard-section">
   <h3 class="mt-5">Gestión de Semillas</h3>
 
-  <form class="row g-3 mt-3 mb-4" enctype="multipart/form-data">
+  <form class="row g-3 mt-3 mb-4" enctype="multipart/form-data" action="">
 
     <div class="col-md-3">
-      <input type="text" class="form-control" placeholder="Nombre" required>
-    </div>
+      <input type="text" class="form-control" placeholder="Nombre" name="nombre_semilla" required >
+    
+      {% if errores and errores.nombre_semilla %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.nombre_semilla }}
+        </div>
+      {% endif %}
 
-    <div class="col-md-3">
-      <input type="text" class="form-control" placeholder="Descripción" required>
-    </div>
-
-    <div class="col-md-2">
-      <input type="text" class="form-control" placeholder="Temporada" required>
-    </div>
-
-    <div class="col-md-2">
-      <input type="text" class="form-control" placeholder="Clima" required>
-    </div>
-
-    <div class="col-md-2">
-      <input type="text" class="form-control" placeholder="Riego" required>
-    </div>
-
-    <div class="col-md-2">
-      <input type="text" class="form-control" placeholder="Ubicación" required>
     </div>
 
     <div class="col-md-3">
-      <input type="text" class="form-control" placeholder="Vitaminas" required>
+      <input type="text" class="form-control" placeholder="Espacio" name="espacio" required >
+
+      {% if errores and errores.espacio %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.espacio }}
+        </div>
+      {% endif %}
+
     </div>
 
-    <div class="col-md-3">
-      <input type="file" class="form-control" accept="image/*" required>
+    <div class="col-md-2">
+      <input type="text" class="form-control" placeholder="URL Imagen" name="imagen_semilla" required>
+
+      {% if errores and errores.imagen_semilla %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.imagen_semilla }}
+        </div>
+      {% endif %}
+
     </div>
+
+    
+
+    <div class="col-md-2">
+      <input type="text" class="form-control" placeholder="Clave Vitamina" name="vitamina" required>
+
+      {% if errores and errores.vitamina %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.vitamina }}
+        </div>
+      {% endif %}
+
+    </div>
+
+    
+
+    <div class="col-md-2">
+      <input type="text" class="form-control" placeholder="Clave Municipio" name="municipio" required>
+
+      {% if errores and errores.municipio %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.municpio }}
+        </div>
+      {% endif %}
+
+    </div>
+
+    
+
+    <div class="col-md-2">
+      <input type="text" class="form-control" placeholder="Clave Tipo" name="tipo_semilla" required>
+
+      {% if errores and errores.tipo_semilla %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.tipo_semilla }}
+        </div>
+      {% endif %}
+
+    </div>
+
+    
+
+    <div class="col-md-3">
+      <input type="text" class="form-control" placeholder="Clave Fertilizante" name="fertilizante" required>
+
+      {% if errores and errores.fertilizante %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.fertilizante }}
+        </div>
+      {% endif %}
+
+    </div>
+
+    
 
     <div class="col-12">
       <button type="submit" class="btn btn-success">Agregar Semilla</button>
@@ -289,38 +424,36 @@
     <thead>
       <tr>
         <th>ID</th>
-        <th>Imagen</th>
         <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Temporada</th>
-        <th>Clima</th>
-        <th>Riego</th>
-        <th>Ubicación</th>
-        <th>Vitaminas</th>
+        <th>Espacio</th>
+        <th>imagen</th>
+        <th>Clave_Municipio</th>
+        <th>Clave_tipo</th>
+        <th>Clave_Fertilizante</th>
         <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>001</td>
-        <td><img src="https://via.placeholder.com/50" alt="Imagen Maíz" style="max-width: 50px;"></td>
-        <td>Maíz</td>
-        <td>Semilla para cultivo de primavera</td>
-        <td>Primavera</td>
-        <td>Templado</td>
-        <td>Moderado</td>
-        <td>Querétaro</td>
-        <td>Vitamina A, B, C</td>
-        <td class="action-buttons">
-          <button class="btn btn-warning btn-sm">Editar</button>
-          <button class="btn btn-danger btn-sm">Eliminar</button>
-        </td>
-      </tr>
+      {% for sem in semillas %}
+        <tr>
+          <td>{{sem.0}}</td>
+          <td><img src="{{sem.1}}" alt=""></td>
+          <td>{{sem.2}}</td>
+          <td>{{sem.3}}</td>
+          <td>{{sem.4}}</td>
+          <td>{{sem.5}}</td>
+          <td>{{sem.6}}</td>
+          <td class="action-buttons">
+            <button class="btn btn-warning btn-sm">Editar</button>
+            <button class="btn btn-danger btn-sm">Eliminar</button>
+          </td>
+        </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>
 
-
+<!-- Tutoriales Activos -->
 
 <div id="tutoriales" class="dashboard-section">
   <h3 class="mt-5">Tutoriales Activos</h3>
@@ -330,19 +463,41 @@
   
 
     <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Título" required>
+      <input type="text" class="form-control" placeholder="Nombre del vídeo" name="nombre_video" required>
+
+      {% if errores and errores.nombre_video %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.nombre_video }}
+        </div>
+      {% endif %}
+
     </div>
 
     <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Duración (ej: 10 min)" required>
+      <input type="text" class="form-control" placeholder="Descripción" name="descripcion_video" required>
+
+      {% if errores and errores.descripcion_video %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.descripcion_video }}
+        </div>
+      {% endif %}
+
     </div>
 
     <div class="col-md-3">
-      <input type="file" class="form-control" accept="image/*" required>
+      <input type="text" class="form-control" placeholder="URL" name="URL_video" required>
+
+      {% if errores and errores.URL_video %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.URL_video }}
+        </div>
+      {% endif %}
+
     </div>
 
     <div class="col-12">
       <button type="submit" class="btn btn-success">Agregar Tutorial</button>
+
     </div>
 
   </form>
@@ -354,23 +509,25 @@
       <tr>
         <th>ID</th>
         <th>Título</th>
-        <th>Duración</th>
+        <th>Descripción</th>
+        <th>URL</th>
         <th>Acciones</th>
       </tr>
     </thead>
 
     <tbody>
-
-      <tr>
-        <td>001</td>
-        <td>Cómo sembrar tomates</td>
-        <td>10 min</td>
-        <td class="action-buttons">
-          <button class="btn btn-warning btn-sm">Editar</button>
-          <button class="btn btn-danger btn-sm">Eliminar</button>
-        </td>
-      </tr>
-
+      {% for tuto in tutoriales %}
+        <tr>
+          <td>{{tuto.0}}</td>
+          <td>{{tuto.1}}</td>
+          <td>{{tuto.2}}</td>
+          <td><a href="{{tuto.3}}">{{tuto.3}}</a></td>
+          <td class="action-buttons">
+            <button class="btn btn-warning btn-sm">Editar</button>
+            <button class="btn btn-danger btn-sm">Eliminar</button>
+          </td>
+        </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>
