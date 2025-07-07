@@ -123,46 +123,50 @@ def guardarusuario():
             finally:
                 cursor.close()
                 
-                
-                
 @app.route('/guardarAdmin', methods=['POST'])
-def guardaradmin():
+def guardarAdmin():
     errores = {}
     nombre = request.form.get('txtNombre', '').strip()
     correo = request.form.get('txtCorreo', '').strip()
     contrasena = request.form.get('txtContrasena', '').strip()
     rol = request.form.get('txtRol', '').strip() or 'editor'
-
+    
     if not nombre:
         errores['txtNombreAdmin'] = 'Nombre del administrador obligatorio'
-
+    
     if not correo:
         errores['txtCorreoAdmin'] = 'Correo electrónico obligatorio'
     elif not re.match(r'[^@]+@[^@]+\.[^@]+', correo):
         errores['txtCorreo'] = 'Formato de correo inválido'
-
+    
     if not contrasena:
         errores['txtContrasenaAdmin'] = 'Contraseña obligatoria'
     elif len(contrasena) < 8:
         errores['txtContrasenaAdmin'] = 'La contraseña debe tener al menos 8 caracteres'
-   
-   
+    
     if not errores:
         try:
             cursor = mysql.connection.cursor()
-            cursor.execute('INSERT INTO administradores(nombre, correo, contrasena, rol) VALUES (%s, %s, %s, %s)',(nombre, correo, contrasena, rol))
+            cursor.execute('INSERT INTO administradores(nombre, correo, contrasena, rol) VALUES (%s, %s, %s, %s)',
+                         (nombre, correo, contrasena, rol))
             mysql.connection.commit()
             flash('Administrador guardado en la BD')
             return redirect(url_for('Inicio'))
-      
-    
+        
         except Exception as e:
             mysql.connection.rollback()
             flash('Algo falló: ' + str(e))
             return redirect(url_for('Inicio'))
-    
+        
         finally:
             cursor.close()
+    
+    else:
+        # Aquí está la corrección: manejar el caso cuando hay errores
+        # Puedes hacer flash de los errores y redirigir, o renderizar un template
+        for campo, mensaje in errores.items():
+            flash(mensaje)
+        return redirect(url_for('Inicio'))  # O el template que corresponda
        
 
 if __name__ == '__main__':
