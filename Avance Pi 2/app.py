@@ -137,13 +137,12 @@ def agregarSemilla():
                 lista_valores = [nombre_semilla, espacio_semilla, imagen_semilla, vitamina_semilla, municipio_semilla, tipo_semilla, fertilizante_semilla]
                 errores["semillaDuplicada"] = "Ya existe una semilla bajo el mismo nombre, ¿deseas sobreescribir su información?"
                 session["sobreescribirSemilla"] = lista_valores
-        session["errores"] = errores
-        return redirect(url_for("Inicio"))
+        return render_template('index.html', errores=errores)
 
     except Exception as e:
         errores["errorInterno"] = "Ocurrió un error, favor de intentarlo nuevamente más tarde"
         session["errores"] = errores
-        return redirect(url_for("Inicio"))
+        return render_template('index.html', errores=errores)
     finally:
         cursor.close()
 
@@ -163,8 +162,7 @@ def sobreescribirSemilla():
         return redirect(url_for("Inicio"))
     except Exception as e:
         errores["errorInterno"] = "Ocurrió un error, favor de intentarlo nuevamente más tarde"
-        session["errores"] = errores
-        return redirect(url_for("Inicio"))
+        return render_template('index.html', errores=errores)
     finally:
         cursor.close()
     
