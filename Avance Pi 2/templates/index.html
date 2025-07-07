@@ -77,6 +77,7 @@
     color: #007bff !important;
   }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 
@@ -142,14 +143,56 @@
 
     {% with mensajes = get_flashed_messages() %}
       {% if mensajes %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-          {% for msj in mensajes %}
-            {{ msj }}
-          {% endfor %}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        <script>
+          Swal.fire({
+            icon: 'success', 
+            title: 'Mensaje',
+            text: "{{ mensajes[0] }}",
+            showConfirmButton: true
+          });
+        </script>
       {% endif %}
     {% endwith %}
+
+    {% if errores and errores.camposVacios %}
+      <script>
+        Swal.fire({
+          icon: 'error', 
+          title: 'Error',
+          text: "{{ errores.camposVacios }}",
+          showConfirmButton: true
+        });
+      </script>
+    {% endif %}
+
+    {% if errores and errores.semillaDuplicada %}
+      <script>
+        Swal.fire({
+          title: "Semilla duplicada",
+          text: "{{ errores.semillaDuplicada }}",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sobreescribir"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            document.getElementById("sobreescribirS").submit();
+          }
+        });
+      </script>
+    {% endif %}
+
+    {% if errores and errores.errorInterno %}
+      <script>
+        Swal.fire({
+          icon: 'error', 
+          title: 'Error',
+          text: "{{ errores.errorInterno }}",
+          showConfirmButton: true
+        });
+      </script>
+    {% endif %}
 
 
     <!-- Sección de formularios -->
@@ -326,91 +369,42 @@
 <div id="semillas" class="dashboard-section">
   <h3 class="mt-5">Gestión de Semillas</h3>
 
-  <form class="row g-3 mt-3 mb-4" enctype="multipart/form-data" action="">
+  <form class="row g-3 mt-3 mb-4" enctype="multipart/form-data" action="{{ url_for('agregarSemilla') }}" method="POST">
 
     <div class="col-md-3">
       <input type="text" class="form-control" placeholder="Nombre" name="nombre_semilla" required >
-    
-      {% if errores and errores.nombre_semilla %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.nombre_semilla }}
-        </div>
-      {% endif %}
-
     </div>
 
     <div class="col-md-3">
       <input type="text" class="form-control" placeholder="Espacio" name="espacio" required >
-
-      {% if errores and errores.espacio %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.espacio }}
-        </div>
-      {% endif %}
-
     </div>
 
     <div class="col-md-2">
       <input type="text" class="form-control" placeholder="URL Imagen" name="imagen_semilla" required>
-
-      {% if errores and errores.imagen_semilla %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.imagen_semilla }}
-        </div>
-      {% endif %}
-
     </div>
 
     
 
     <div class="col-md-2">
       <input type="text" class="form-control" placeholder="Clave Vitamina" name="vitamina" required>
-
-      {% if errores and errores.vitamina %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.vitamina }}
-        </div>
-      {% endif %}
-
     </div>
 
     
 
     <div class="col-md-2">
       <input type="text" class="form-control" placeholder="Clave Municipio" name="municipio" required>
-
-      {% if errores and errores.municipio %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.municpio }}
-        </div>
-      {% endif %}
-
     </div>
 
     
 
     <div class="col-md-2">
       <input type="text" class="form-control" placeholder="Clave Tipo" name="tipo_semilla" required>
-
-      {% if errores and errores.tipo_semilla %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.tipo_semilla }}
-        </div>
-      {% endif %}
-
     </div>
 
     
 
     <div class="col-md-3">
       <input type="text" class="form-control" placeholder="Clave Fertilizante" name="fertilizante" required>
-
-      {% if errores and errores.fertilizante %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.fertilizante }}
-        </div>
-      {% endif %}
-
     </div>
 
     
@@ -420,16 +414,20 @@
     </div>
   </form>
 
+  <form id="sobreescribirS" action="/sobreescribir_semilla" method="POST"></form>
+
   <table class="table table-bordered table-hover">
     <thead>
       <tr>
         <th>ID</th>
         <th>Nombre</th>
+        <th>Imagen</th>
         <th>Espacio</th>
-        <th>imagen</th>
+        <th>Imagen_URL</th>
+        <th>Clave_Vitamina</th>
         <th>Clave_Municipio</th>
-        <th>Clave_tipo</th>
-        <th>Clave_Fertilizante</th>
+        <th>Clave_Tipo</th>
+        <th>Clave_Fertilizantes</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -437,12 +435,14 @@
       {% for sem in semillas %}
         <tr>
           <td>{{sem.0}}</td>
-          <td><img src="{{sem.1}}" alt=""></td>
+          <td>{{sem.1}}</td>
+          <td><img src="{{sem.3}}" alt="Imagen de {{sem.1}}"></td>
           <td>{{sem.2}}</td>
           <td>{{sem.3}}</td>
           <td>{{sem.4}}</td>
           <td>{{sem.5}}</td>
           <td>{{sem.6}}</td>
+          <td>{{sem.7}}</td>
           <td class="action-buttons">
             <button class="btn btn-warning btn-sm">Editar</button>
             <button class="btn btn-danger btn-sm">Eliminar</button>
@@ -541,6 +541,15 @@
       document.getElementById(id).style.display = 'block';
       document.getElementById(id).scrollIntoView({ behavior: "smooth" });
     }
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const vista = "{{ session.get('vista_activa', '') }}";
+      if(vista){
+        Vista(vista);
+      }
+    });
   </script>
 </body>
 </html>
