@@ -95,7 +95,6 @@
 
 <body class="bg-light">
 
-  x
 
   <div class="container py-5">
     <h1 class="mb-4 text-center">Inicio</h1>
@@ -107,7 +106,7 @@
         <div class="card gradient-border" onclick="Vista('usuarios')">
           <div class="card-body">
             <h5 class="card-title">Usuarios Registrados</h5>
-            <p class="card-text fs-4">320</p>
+            <p class="card-text fs-4">1</p>
           </div>
         </div>
       </div>
@@ -203,43 +202,39 @@
   <h3 class="mt-5">Gestión de Usuarios</h3>
 
   
-  <form class="row g-3 mt-3 mb-4" action="">
+ <form class="row g-3 mt-3 mb-4" action="/guardarUsuario" method="POST">
 
     
 
     <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Nombre" required>
+      <input type = "text" class="form-control" name="txtNombre" placeholder="Nombre " value="{{ request.form.txtNombre }}">
+       {% if errores and  errores.txtNombre %}
+            <p style="color:red">{{errores.txtNombre}}</p> 
+        {% endif %}
     </div>
 
-    <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Correo Electrónico" name="correo" required>
-
-      {% if errores and errores.correo %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.correo }}
-        </div>
-      {% endif %}
+     <div class="col-md-4">
+      <input type = "text" class="form-control" name="txtCorreo" placeholder="Correo Electrónico " value="{{ request.form.txtCorreo }}">
+       {% if errores and errores.txtCorreo %}
+            <p style="color:red">{{errores.txtCorreo}}</p> 
+        {% endif %}
     </div>
 
+
     <div class="col-md-4">
-      <input type="password" class="form-control" placeholder="Contraseña" name="contrasena" required>
-
-      {% if errores and errores.contrasena %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.contrasena }}
-        </div>
-      {% endif %}
-
+      <input type = "text" class="form-control" name="txtContrasena" placeholder="Contraseña " value="{{ request.form.txtContrasena }}">
+       {% if errores and  errores.txtContrasena%}
+            <p style="color:red">{{errores.txtContrasena}}</p> 
+        {% endif %}
     </div>
 
-    <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Teléfono" name="telefono" required>
 
-      {% if errores and errores.telefono %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.telefono }}
-        </div>
-      {% endif %}
+     <div class="col-md-4">
+      <input type = "text" class="form-control" name="txtTelefono" placeholder="Teléfono" value="{{ request.form.txtTelefono }}">
+       {% if errores and errores.txtTelefono %}
+            <p style="color:red">{{errores.txtTelefono}}</p> 
+        {% endif %}
+    </div>
 
     </div>
 
@@ -247,7 +242,7 @@
     
 
     <div class="col-12">
-      <button type="submit" class="btn btn-success">Agregar Usuario</button>
+      <button type="submit" class="btn btn-success">Guardar Usuario</button>
     </div>
     
   </form>
@@ -283,48 +278,37 @@
   </table>
 </div>
 
+
+
 <!-- Administradores Activos -->
 
 <div id="admins" class="dashboard-section">
   <h3 class="mt-5">Administradores Activos</h3>
 
 
-  <form class="row g-3 mt-3 mb-4" action="">
+  <form class="row g-3 mt-3 mb-4" action="/guardarAdmin" method="POST">
 
-    
-
-    <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Nombre" name="nombre_admin" required>
-
-      {% if errores and errores.nombre_admin %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.nombre_admin }}
-        </div>
-      {% endif %}
-
-    </div>
+  <div class="col-md-4">
+      <input type = "text" class="form-control" name="txtNombreAdmin" placeholder="Nombre " value="{{ request.form.txtNombreAdmin }}">
+       {% if errores and  errores.txtNombreAdmin%}
+            <p style="color:red">{{errores.txtNombreAdmin}}</p> 
+        {% endif %}
+    </div>  
 
     <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Correo Electrónico" name="correo_admin" required>
-
-      {% if errores and errores.correo_admin %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.correo_admin }}
-        </div>
-      {% endif %}
-
-    </div>
+      <input type = "text" class="form-control" name="txtCorreoAdmin" placeholder="Correo " value="{{ request.form.txtCorreoAdmin }}">
+       {% if errores and  errores.txtCorreoAdmin%}
+            <p style="color:red">{{errores.txtCorreoAdmin}}</p> 
+        {% endif %}
+    </div>  
 
     <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Contraseña" name="contrasena_admin" required>
+      <input type = "text" class="form-control" name="txtContrasenaAdmin" placeholder="Contraseña " value="{{ request.form.txtContrasenaAdmin }}">
+       {% if errores and  errores.txtContrasenaAdmin %}
+            <p style="color:red">{{errores.txtContrasenaAdmin}}</p> 
+        {% endif %}
+    </div>  
 
-      {% if errores and errores.contrasena_admin %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.contrasena_admin }}
-        </div>
-      {% endif %}
-
-    </div>
 
 
     <div class="col-12">
@@ -363,6 +347,9 @@
     </tbody>
   </table>
 </div>
+
+
+
 
 <!-- Gestión de Semillas -->
 
@@ -458,7 +445,7 @@
 <div id="tutoriales" class="dashboard-section">
   <h3 class="mt-5">Tutoriales Activos</h3>
 
-  <form class="row g-3 mt-3 mb-4">
+  <form class="row g-3 mt-3 mb-4" action="" method="POST">
     
   
 
