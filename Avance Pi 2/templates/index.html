@@ -236,7 +236,6 @@
         {% endif %}
     </div>
 
-    </div>
 
 
     
@@ -532,11 +531,11 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const vista = "{{ session.get('vista_activa', '') }}";
-      if(vista){
+      const vista = "{{ vista }}";
+      if (vista) {
         Vista(vista);
       }
-    });
+  });
   </script>
 </body>
 </html>

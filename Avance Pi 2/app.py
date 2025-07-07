@@ -49,9 +49,6 @@ def metodoNoPermitido(e):
 @app.route('/')
 def Inicio():
     
-    errores = session.get("errores", "")
-
-    
     #En este ruta irán todas las consultas de los 4 formularios
     #Porque todos los formualarios están en un sólo archivo html
     #Se deben insertar las 4 consultas en el mismo try-catch para evitar hacer varios html
@@ -61,6 +58,9 @@ def Inicio():
     
 
     try:
+        errores = session.get("errores", "")
+        vista = session.get("vista_activa", "")
+
         # Inicio del cursor
         cursor = mysql.connection.cursor()
         
@@ -82,6 +82,7 @@ def Inicio():
 
         return render_template('index.html', 
                                 errores=errores,
+                                vista=vista,
                                 usuarios = consultaUsuarios,
                                 administradores = consultaAdministradores, 
                                 semillas = consultaSemillas, 
@@ -92,9 +93,10 @@ def Inicio():
         print('Error en algunas de las consultas: ' + str(e))
 
         # Puedes enviar un mensaje de error a la plantilla si quieres mostrarlo
-        errores = {'general': 'Hubo un problema cargando los datos'}
+        errores['general'] = 'Hubo un problema cargando los datos'
         return render_template('index.html',
                                errores=errores,
+                               vista="",
                                usuarios=[],  # listas vacías
                                administradores=[],
                                semillas=[],
@@ -102,6 +104,9 @@ def Inicio():
 
     finally:
         cursor.close()
+        session.pop("vista_activa", None)
+        session.pop("errores", None)
+        session.pop("sobreescribirSemilla", None)
 
 @app.route("/agregar_semilla", methods=["POST"])
 def agregarSemilla():
@@ -132,10 +137,12 @@ def agregarSemilla():
                 lista_valores = [nombre_semilla, espacio_semilla, imagen_semilla, vitamina_semilla, municipio_semilla, tipo_semilla, fertilizante_semilla]
                 errores["semillaDuplicada"] = "Ya existe una semilla bajo el mismo nombre, ¿deseas sobreescribir su información?"
                 session["sobreescribirSemilla"] = lista_valores
-        return render_template("index.html", errores = errores)
+        session["errores"] = errores
+        return redirect(url_for("Inicio"))
 
     except Exception as e:
         errores["errorInterno"] = "Ocurrió un error, favor de intentarlo nuevamente más tarde"
+        session["errores"] = errores
         return redirect(url_for("Inicio"))
     finally:
         cursor.close()
@@ -165,40 +172,40 @@ def sobreescribirSemilla():
     
 @app.route('/guardarUsuario', methods=['POST'])
 def guardarusuario():
-        errores= {} 
-        nombre = request.form.get('txtNombre', '').strip()
-        correo = request.form.get('txtCorreo', '').strip()
-        contrasena = request.form.get('txtContrasena', '').strip()
-        telefono = request.form.get('txtTelefono', '').strip()
-        
-        
-        if not nombre:
-            errores['txtNombre'] = 'Nombre del usuario Obligatorio'
-            
-        if not correo:
-            errores['txtCorreo'] = 'Correo es Obligatorio'
-        
-        if not contrasena:
-            errores['txtContrasena'] = 'Contraseña obligatoria'
-        
-        if not telefono:
-            errores['txtTelefono'] = 'Teléfono obligatorio'
+    errores= {} 
+    nombre = request.form.get('txtNombre', '').strip()
+    correo = request.form.get('txtCorreo', '').strip()
+    contrasena = request.form.get('txtContrasena', '').strip()
+    telefono = request.form.get('txtTelefono', '').strip()
     
-        if not errores:
-            try:
-                cursor= mysql.connection.cursor()
-                cursor.execute('insert into usuarios(nombre,email,contrasena,telefono) values(%s,%s,%s,%s)',(nombre, correo,contrasena, telefono))
-                mysql.connection.commit()
-                flash('Usuario guardado en la BD')
-                return redirect(url_for('Inicio'))
-            
-            except Exception as e:
-                mysql.connection.rollback() 
-                flash('Algo fallo:'+str(e))
-                return  redirect(url_for('Inicio'))
-            
-            finally:
-                cursor.close()
+    
+    if not nombre:
+        errores['txtNombre'] = 'Nombre del usuario Obligatorio'
+        
+    if not correo:
+        errores['txtCorreo'] = 'Correo es Obligatorio'
+    
+    if not contrasena:
+        errores['txtContrasena'] = 'Contraseña obligatoria'
+    
+    if not telefono:
+        errores['txtTelefono'] = 'Teléfono obligatorio'
+
+    if not errores:
+        try:
+            cursor= mysql.connection.cursor()
+            cursor.execute('insert into usuarios(nombre,email,contrasena,telefono) values(%s,%s,%s,%s)',(nombre, correo,contrasena, telefono))
+            mysql.connection.commit()
+            flash('Usuario guardado en la BD')
+            return redirect(url_for('Inicio'))
+        
+        except Exception as e:
+            mysql.connection.rollback() 
+            flash('Algo fallo:'+str(e))
+            return  redirect(url_for('Inicio'))
+        
+        finally:
+            cursor.close()
                 
                 
                 
@@ -244,5 +251,3 @@ def guardaradmin():
 
 if __name__ == '__main__':
     app.run(port=3000, debug=True)
-    
-    
