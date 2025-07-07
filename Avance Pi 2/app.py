@@ -7,7 +7,7 @@ app = Flask (__name__)
 
 app.config['MYSQL_HOST'] = "localhost"
 app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = "123456"
+app.config['MYSQL_PASSWORD'] = "Kesadilla94"
 app.config['MYSQL_DB'] = "QroHuerto"
 #app.config['MYSQL_PORT'] = 3306
 app.secret_key = 'mysecretkey'
@@ -207,6 +207,41 @@ def guardarusuario():
         finally:
             cursor.close()
                 
+    
+@app.route('/guardarTutorial', methods=['POST'])
+def guardartutorial():
+    errores = {}
+    nombre_video = request.form.get('nombre_video', '').strip()
+    descripcion_video = request.form.get('descripcion_video', '').strip()
+    URL_video = request.form.get('URL_video', '').strip()
+    
+    if not nombre_video:
+        errores['nombre_video'] = 'Nombre del video es obligatorio'
+        
+    if not descripcion_video:
+        errores['descripcion_video'] = 'Descripción del video es obligatoria'
+    
+    if not URL_video:
+        errores['URL_video'] = 'URL del video es obligatoria'
+        
+    if not errores:
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute('insert into videos(nombre,descripción,URL) values(%s,%s,%s)', (nombre_video, descripcion_video, URL_video))
+            mysql.connection.commit()
+            flash('Tutorial guardado en la BD')
+            return redirect(url_for('Inicio'))
+        
+        except Exception as e:
+            mysql.connection.rollback()
+            flash('Algo fallo:' + str(e))
+            return redirect(url_for('Inicio'))
+        
+        finally:
+            cursor.close()
+    
+    # Si hay errores, redirigir de vuelta con los errores
+    return redirect(url_for('Inicio'))
                 
                 
 @app.route('/guardarAdmin', methods=['POST'])
