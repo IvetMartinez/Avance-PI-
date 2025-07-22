@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Usuario</title>
+    <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+</head>
+<body>
+    <div class="dashboard-section">
+        <h3 class="mt-5">Modificar Usuario</h3>
+
+        <form class="row g-3 mt-3 mb-4" action="/actualizar_usuario" method="POST">
+            
+            <input type="hidden" name="idUsuario" value="{{nUsuario.0}}">
+
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="ntxtNombre" placeholder="Nombre" value="{{ nUsuario.1 }}">
+                    {% if errores and errores.txtNombre %}
+                    <p style="color:red">{{errores.txtNombre}}</p> 
+                    {% endif %}
+            </div>
+
+            <div class="col-md-4">
+                <input type="email" class="form-control" name="ntxtCorreo" placeholder="Correo Electrónico" value="{{ nUsuario.2 }}">
+                    {% if errores and errores.txtCorreo %}
+                        <p style="color:red">{{errores.txtCorreo}}</p> 
+                    {% endif %}
+            </div>
+
+            <div class="col-md-4">
+                <input type="password" class="form-control" name="ntxtContrasena" placeholder="Contraseña" value="{{ nUsuario.3 }}">
+                    {% if errores and errores.txtContrasena %}
+                        <p style="color:red">{{errores.txtContrasena}}</p> 
+                    {% endif %}
+            </div>
+
+            <div class="col-md-4">
+                <input type="tel" class="form-control" name="ntxtTelefono" placeholder="Teléfono" value="{{ nUsuario.4 }}">
+                    {% if errores and errores.txtTelefono %}
+                        <p style="color:red">{{errores.txtTelefono}}</p> 
+                    {% endif %}
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-success">Modificar Usuario</button>
+                <form action="/"><button>Regresar</button></form>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

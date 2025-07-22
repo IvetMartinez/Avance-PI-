@@ -65,19 +65,19 @@ def Inicio():
         cursor = mysql.connection.cursor()
         
         # Consulta de Usuarios
-        cursor.execute('SELECT * FROM usuarios')
+        cursor.execute('SELECT * FROM usuarios where estado = 1')
         consultaUsuarios = cursor.fetchall()
         
         # Consulta de Administradores
-        cursor.execute('SELECT * FROM administradores')
+        cursor.execute('SELECT * FROM administradores where estado = 1')
         consultaAdministradores = cursor.fetchall()
         
         # Consulta de Semillas
-        cursor.execute('SELECT * FROM semillas')
+        cursor.execute('SELECT * FROM semillas where estado = 1')
         consultaSemillas = cursor.fetchall()
         
         # Consulta de Tutoriales
-        cursor.execute('SELECT * FROM videos')
+        cursor.execute('SELECT * FROM videos where estado = 1')
         consultaTutoriales = cursor.fetchall()
 
         return render_template('index.html', 
@@ -95,12 +95,12 @@ def Inicio():
         # Puedes enviar un mensaje de error a la plantilla si quieres mostrarlo
         errores['general'] = 'Hubo un problema cargando los datos'
         return render_template('index.html',
-                               errores=errores,
-                               vista="",
-                               usuarios=[],  # listas vacías
-                               administradores=[],
-                               semillas=[],
-                               tutoriales=[])
+                                errores=errores,
+                                vista="",
+                                usuarios=[],  # listas vacías
+                                administradores=[],
+                                semillas=[],
+                                tutoriales=[])
 
     finally:
         cursor.close()
@@ -108,66 +108,8 @@ def Inicio():
         session.pop("errores", None)
         session.pop("sobreescribirSemilla", None)
 
-@app.route("/agregar_semilla", methods=["POST"])
-def agregarSemilla():
-    try:
-        session["vista_activa"] = "semillas"
-        errores = {}
 
-        nombre_semilla = request.form.get("nombre_semilla", "").strip().title()
-        espacio_semilla = request.form.get("espacio", "").strip()
-        imagen_semilla = request.form.get("imagen_semilla", "").strip()
-        vitamina_semilla = request.form.get("vitamina", "").strip()
-        municipio_semilla = request.form.get("municipio", "").strip()
-        tipo_semilla = request.form.get("tipo_semilla", "").strip()
-        fertilizante_semilla = request.form.get("fertilizante", "").strip()
-
-        if not nombre_semilla or not espacio_semilla or not imagen_semilla or not vitamina_semilla or not municipio_semilla or not tipo_semilla or not fertilizante_semilla:
-            errores["camposVacios"] = "No se pueden dejar campos vacíos"
-        else:
-            cursor = mysql.connection.cursor()
-            cursor.execute("SELECT 1 FROM Semillas WHERE Nombre = %s", (nombre_semilla,))
-            semillaDuplicada = cursor.fetchone()
-            if not semillaDuplicada:
-                cursor.execute("INSERT INTO Semillas(Nombre, Espacio, Imagen_URL, Clave_Vitamina, Clave_municipio, Clave_tipo, Clave_fertilizante) VALUES (%s, %s, %s, %s, %s, %s, %s)", (nombre_semilla, espacio_semilla, imagen_semilla, vitamina_semilla, municipio_semilla, tipo_semilla, fertilizante_semilla))
-                mysql.connection.commit()
-                flash("La semilla se guardó en la base de datos")
-                return redirect(url_for("Inicio"))
-            else:
-                lista_valores = [nombre_semilla, espacio_semilla, imagen_semilla, vitamina_semilla, municipio_semilla, tipo_semilla, fertilizante_semilla]
-                errores["semillaDuplicada"] = "Ya existe una semilla bajo el mismo nombre, ¿deseas sobreescribir su información?"
-                session["sobreescribirSemilla"] = lista_valores
-        return render_template('index.html', errores=errores)
-
-    except Exception as e:
-        errores["errorInterno"] = "Ocurrió un error, favor de intentarlo nuevamente más tarde"
-        session["errores"] = errores
-        return render_template('index.html', errores=errores)
-    finally:
-        cursor.close()
-
-@app.route("/sobreescribir_semilla", methods=["POST"])
-def sobreescribirSemilla():
-    try:
-        errores = {}
-
-        nombre, espacio, imagen, vitamina, municipio, tipo, fertilizante = session.get("sobreescribirSemilla", "")
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT Clave_semilla FROM Semillas WHERE Nombre = %s", (nombre,))
-        resultado = cursor.fetchone()
-        id_semilla = resultado[0]
-        cursor.execute("UPDATE Semillas SET Nombre = %s, Espacio = %s, Imagen_URL = %s, Clave_Vitamina = %s, Clave_municipio = %s, Clave_tipo = %s, Clave_fertilizante = %s WHERE Clave_semilla = %s", (nombre, espacio, imagen, vitamina, municipio, tipo, fertilizante, id_semilla))
-        mysql.connection.commit()
-        flash("La semilla se guardó en la base de datos")
-        return redirect(url_for("Inicio"))
-    except Exception as e:
-        errores["errorInterno"] = "Ocurrió un error, favor de intentarlo nuevamente más tarde"
-        return render_template('index.html', errores=errores)
-    finally:
-        cursor.close()
-    
-    
-    
+#Rutas para guardar usuarios, actualizarlos y eliminarlos
 @app.route('/guardarUsuario', methods=['POST'])
 def guardarusuario():
     errores= {} 
@@ -204,6 +146,97 @@ def guardarusuario():
         
         finally:
             cursor.close()
+            
+            
+@app.route('/modificar_usuario/<int:id>')
+def modificarUsuario(id):
+    
+    try:
+        errores = session.get("errores", "")
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('select * from usuarios where Idusuario = %s', (id,))
+        consultaId = cursor.fetchone()
+        return render_template ('modificar_usuarios.html', nUsuario = consultaId)
+        
+    except Exception as e:
+        # Aquí convertimos 'e' a cadena antes de usarlo
+        print('Error en algunas de las consultas: ' + str(e))
+
+        # Puedes enviar un mensaje de error a la plantilla si quieres mostrarlo
+        errores['general'] = 'Hubo un problema cargando los datos'
+        return render_template('index.html',
+                                errores=errores,
+                                vista="",
+                                usuarios=[],  # listas vacías
+                                administradores=[],
+                                semillas=[],
+                                tutoriales=[])
+
+    finally:
+        cursor.close()
+        session.pop("vista_activa", None)
+        session.pop("errores", None)
+        session.pop("sobreescribirSemilla", None)
+        
+@app.route('/actualizar_usuario', methods=['POST'])
+def actualizarUsuario():
+    errores= {}
+    idUpdate = request.form.get('idUsuario', '').strip()
+    nNombre = request.form.get('ntxtNombre', '').strip()
+    nCorreo = request.form.get('ntxtCorreo', '').strip()
+    nContrasena = request.form.get('ntxtContrasena', '').strip()
+    nTelefono = request.form.get('ntxtTelefono', '').strip()
+    
+    
+    if not nNombre:
+        errores['ntxtNombre'] = 'Nombre del usuario Obligatorio'
+        
+    if not nCorreo:
+        errores['ntxtCorreo'] = 'Correo es Obligatorio'
+    
+    if not nContrasena:
+        errores['ntxtContrasena'] = 'Contraseña obligatoria'
+    
+    if not nTelefono:
+        errores['ntxtTelefono'] = 'Teléfono obligatorio'
+
+    if not errores:
+        try:
+            cursor= mysql.connection.cursor()
+            cursor.execute('update usuarios set Nombre = %s, Email = %s, Contrasena = %s, Telefono = %s where Idusuario = %s',(nNombre, nCorreo,nContrasena, nTelefono, idUpdate))
+            mysql.connection.commit()
+            flash('Usuario actuzalizado correctamente')
+            return redirect(url_for('Inicio'))
+        
+        except Exception as e:
+            mysql.connection.rollback() 
+            flash('Algo fallo:'+str(e))
+            return  redirect(url_for('Inicio'))
+        
+        finally:
+            cursor.close()
+            
+@app.route('/eliminar_usuario/<int:id>', methods=['POST'])
+def eliminarUsuario(id):
+    
+    try:
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('UPDATE usuarios SET estado = 0 WHERE Idusuario = %s', (id,))
+        mysql.connection.commit()
+        flash('Usuario eliminado correctamente')
+        return redirect(url_for('Inicio'))
+        
+    except Exception as e:
+        mysql.connection.rollback()
+        flash('Error al eliminar: '+ str(e))
+        return render_template('index.html')
+    finally:
+        cursor.close()
+
+
+
                 
 @app.route('/guardarAdmin', methods=['POST'])
 def guardarAdmin():
@@ -229,8 +262,7 @@ def guardarAdmin():
     if not errores:
         try:
             cursor = mysql.connection.cursor()
-            cursor.execute('INSERT INTO administradores(nombre, correo, contrasena, rol) VALUES (%s, %s, %s, %s)',
-                         (nombre, correo, contrasena, rol))
+            cursor.execute('INSERT INTO administradores(nombre, correo, contrasena, rol) VALUES (%s, %s, %s, %s)', (nombre, correo, contrasena, rol))
             mysql.connection.commit()
             flash('Administrador guardado en la BD')
             return redirect(url_for('Inicio'))
@@ -249,7 +281,362 @@ def guardarAdmin():
         for campo, mensaje in errores.items():
             flash(mensaje)
         return redirect(url_for('Inicio'))  # O el template que corresponda
-       
+    
+
+@app.route('/modificar_admin/<int:id>')
+def modificarAdmin(id):
+    
+    try:
+        errores = session.get("errores", "")
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('select * from administradores where id_admin = %s', (id,))
+        consultaId = cursor.fetchone()
+        return render_template ('modificar_admins.html', nAdmin = consultaId)
+        
+    except Exception as e:
+        # Aquí convertimos 'e' a cadena antes de usarlo
+        print('Error en algunas de las consultas: ' + str(e))
+
+        # Puedes enviar un mensaje de error a la plantilla si quieres mostrarlo
+        errores['general'] = 'Hubo un problema cargando los datos'
+        return render_template('index.html',
+                                errores=errores,
+                                vista="",
+                                usuarios=[],  # listas vacías
+                                administradores=[],
+                                semillas=[],
+                                tutoriales=[])
+
+    finally:
+        cursor.close()
+        session.pop("vista_activa", None)
+        session.pop("errores", None)
+        session.pop("sobreescribirSemilla", None)
+
+@app.route('/actualizar_admin', methods=['POST'])
+def actualizarAdmin():
+    errores = {}
+    idUpdate = request.form.get('idAdmin', '').strip()
+    nNombre = request.form.get('ntxtNombre', '').strip()
+    nCorreo = request.form.get('ntxtCorreo', '').strip()
+    nContrasena = request.form.get('ntxtContrasena', '').strip()
+    
+    
+    if not nNombre:
+        errores['ntxtNombreAdmin'] = 'Nombre del administrador obligatorio'
+    
+    if not nCorreo:
+        errores['ntxtCorreoAdmin'] = 'Correo electrónico obligatorio'
+    elif not re.match(r'[^@]+@[^@]+\.[^@]+', nCorreo):
+        errores['ntxtCorreo'] = 'Formato de correo inválido'
+    
+    if not nContrasena:
+        errores['ntxtContrasenaAdmin'] = 'Contraseña obligatoria'
+    elif len(nContrasena) < 8:
+        errores['ntxtContrasenaAdmin'] = 'La contraseña debe tener al menos 8 caracteres'
+    
+    if not errores:
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute('update administradores set nombre = %s, correo = %s, contrasena = %s where id_admin = %s',
+                        (nNombre, nCorreo, nContrasena, idUpdate))
+            mysql.connection.commit()
+            flash('Administrador Actualizado')
+            return redirect(url_for('Inicio'))
+        
+        except Exception as e:
+            mysql.connection.rollback()
+            flash('Algo falló: ' + str(e))
+            return redirect(url_for('Inicio'))
+        
+        finally:
+            cursor.close()
+    
+    else:
+        # Aquí está la corrección: manejar el caso cuando hay errores
+        # Puedes hacer flash de los errores y redirigir, o renderizar un template
+        for campo, mensaje in errores.items():
+            flash(mensaje)
+        return redirect(url_for('Inicio'))  # O el template que corresponda
+    
+@app.route('/eliminar_admin/<int:id>', methods=['POST'])
+def eliminarAdmin(id):
+    
+    try:
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('UPDATE administradores SET estado = 0 WHERE id_admin = %s', (id,))
+        mysql.connection.commit()
+        flash('Administrador eliminado correctamente')
+        return redirect(url_for('Inicio'))
+        
+    except Exception as e:
+        mysql.connection.rollback()
+        flash('Error al eliminar: '+ str(e))
+        return render_template('index.html')
+    finally:
+        cursor.close()
+
+
+
+
+@app.route("/agregar_semilla", methods=["POST"])
+def agregarSemilla():
+    
+        session["vista_activa"] = "semillas"
+        errores = {}
+
+        nombre_semilla = request.form.get("nombre_semilla", "").strip().title()
+        espacio_semilla = request.form.get("espacio", "").strip()
+        imagen_semilla = request.form.get("imagen_semilla", "").strip()
+        vitamina_semilla = request.form.get("vitamina", "").strip()
+        municipio_semilla = request.form.get("municipio", "").strip()
+        tipo_semilla = request.form.get("tipo_semilla", "").strip()
+        fertilizante_semilla = request.form.get("fertilizante", "").strip()
+
+        if not nombre_semilla:
+            errores['nombre_semilla'] = 'Nombre de la semilla obligatoria'
+        if not espacio_semilla:
+            errores['espacio'] = 'Espacio de la semilla obligatoria'
+        if not imagen_semilla:
+            errores['imagen_semilla'] = 'Es necesario agregar una imagen'
+        if not vitamina_semilla:
+            errores['vitamina'] = 'Tipo de vitamina requerido'
+        if not municipio_semilla:
+            errores['municipio'] = 'Municipio requerido'
+        if not tipo_semilla:
+            errores['tipo_semilla'] = 'Tipo de semilla obligatoria'
+        if not fertilizante_semilla:
+            errores['fertilizante'] = 'Tipo de fertilizante obligatorio' 
+        
+        if not errores:
+            try:   
+                cursor = mysql.connection.cursor()
+                cursor.execute("INSERT INTO Semillas(Nombre, Espacio, Imagen_URL, Clave_Vitamina, Clave_municipio, Clave_tipo, Clave_fertilizante) VALUES (%s, %s, %s, %s, %s, %s, %s)", (nombre_semilla, espacio_semilla, imagen_semilla, vitamina_semilla, municipio_semilla, tipo_semilla, fertilizante_semilla))
+                mysql.connection.commit()
+                flash("La semilla se guardó en la base de datos")
+                return render_template('index.html', errores=errores)
+
+            except Exception as e:
+                errores["errorInterno"] = "Ocurrió un error, favor de intentarlo nuevamente más tarde"
+                session["errores"] = errores
+                return render_template('index.html', errores=errores)
+            finally:
+                cursor.close()
+        
+        return render_template('index.html', errores = errores)
+    
+    
+@app.route('/modificar_semilla/<int:id>')
+def modificarSemilla(id):
+    
+    try:
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('select * from semillas where Clave_semilla = %s', (id,))
+        nSemilla = cursor.fetchone()
+        return render_template('modificar_semilla.html', nSemilla = nSemilla, errores = {})
+        
+    except Exception as e:
+        mysql.connection.rollback() 
+        flash('Algo fallo:'+ str(e))
+        return  redirect(url_for('Inicio'))
+        
+    finally:
+        cursor.close()
+    
+@app.route("/actualizar_semilla", methods=["POST"])
+def actualizarSemilla():
+        session["vista_activa"] = "semillas"
+        errores = {}
+        idUpdate = request.form.get('idSemilla', '').strip()
+        nnombre_semilla = request.form.get("nnombre_semilla", "").strip().title()
+        nespacio_semilla = request.form.get("nespacio", "").strip()
+        nimagen_semilla = request.form.get("nimagen_semilla", "").strip()
+        nvitamina_semilla = request.form.get("nvitamina", "").strip()
+        nmunicipio_semilla = request.form.get("nmunicipio", "").strip()
+        ntipo_semilla = request.form.get("ntipo_semilla", "").strip()
+        nfertilizante_semilla = request.form.get("nfertilizante", "").strip()
+
+        if not nnombre_semilla:
+            errores['nombre_semilla'] = 'Nombre de la semilla obligatoria'
+        if not nespacio_semilla:
+            errores['espacio'] = 'Espacio de la semilla obligatoria'
+        if not nimagen_semilla:
+            errores['imagen_semilla'] = 'Es necesario agregar una imagen'
+        if not nvitamina_semilla:
+            errores['vitamina'] = 'Tipo de vitamina requerido'
+        if not nmunicipio_semilla:
+            errores['municipio'] = 'Municipio requerido'
+        if not ntipo_semilla:
+            errores['tipo_semilla'] = 'Tipo de semilla obligatoria'
+        if not nfertilizante_semilla:
+            errores['fertilizante'] = 'Tipo de fertilizante obligatorio' 
+        
+        if not errores:
+            try:   
+                cursor = mysql.connection.cursor()
+                cursor.execute('update semillas set nombre = %s, espacio =%s, Imagen_URL = %s, clave_vitamina = %s, Clave_municipio =%s, Clave_tipo =%s, Clave_fertilizante = %s where Clave_semilla = %s', (nnombre_semilla, nespacio_semilla, nimagen_semilla, nvitamina_semilla, nmunicipio_semilla, ntipo_semilla, nfertilizante_semilla, idUpdate))
+                mysql.connection.commit()
+                flash("La semilla se guardó en la base de datos")
+                return redirect(url_for('Inicio'))
+
+            except Exception as e:
+                errores["errorInterno"] = "Ocurrió un error, favor de intentarlo nuevamente más tarde"
+                session["errores"] = errores
+                return render_template('modificar_semilla.html', errores=errores)
+            finally:
+                cursor.close()
+        
+        return render_template('index.html', errores = errores)
+    
+@app.route('/eliminar_semilla/<int:id>', methods=['POST'])
+def eliminarSemilla(id):
+    
+    try:
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('UPDATE semillas SET estado = 0 WHERE Clave_semilla = %s', (id,))
+        mysql.connection.commit()
+        flash('Semilla eliminada correctamente')
+        return redirect(url_for('Inicio'))
+        
+    except Exception as e:
+        mysql.connection.rollback()
+        flash('Error al eliminar: '+ str(e))
+        return render_template('index.html')
+    finally:
+        cursor.close()
+
+
+    
+    
+#TERMINAR LA SECCIÓN DE CRUD DE LOS TUTORIALES
+@app.route('/guardarTutorial', methods=['POST'])
+def guardarTutorial():
+    errores= {} 
+    nombre = request.form.get('nombre_video', '').strip()
+    descripcion = request.form.get('descripcion_video', '').strip()
+    URL = request.form.get('URL_video', '').strip()
+    
+    
+    
+    if not nombre:
+        errores['nombre_video'] = 'Nombre del video Obligatorio'
+        
+    if not descripcion:
+        errores['descripcion_video'] = 'Descripción del video es obligatoria'
+    
+    if not URL:
+        errores['URL_video'] = 'Necesitas colocar '
+    
+    
+
+    if not errores:
+        try:
+            cursor= mysql.connection.cursor()
+            cursor.execute('insert into videos(nombre, descripción, URL) values(%s,%s,%s)',(nombre, descripcion, URL))
+            mysql.connection.commit()
+            flash('Video guardado exitosamente')
+            return redirect(url_for('Inicio'))
+        
+        except Exception as e:
+            mysql.connection.rollback() 
+            flash('Algo fallo:'+str(e))
+            return  redirect(url_for('Inicio'))
+        
+        finally:
+            cursor.close()
+            
+    return render_template('index.html', errores=errores)
+@app.route('/modificar_tutorial/<int:id>')
+def modificarTutorial(id):
+    
+    try:
+        errores = session.get("errores", "")
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('select * from videos where Clave_video = %s', (id,))
+        consultaId = cursor.fetchone()
+        return render_template ('modificar_tutoriales.html', nTuto = consultaId)
+        
+    except Exception as e:
+        # Aquí convertimos 'e' a cadena antes de usarlo
+        print('Error en algunas de las consultas: ' + str(e))
+
+        # Puedes enviar un mensaje de error a la plantilla si quieres mostrarlo
+        errores['general'] = 'Hubo un problema cargando los datos'
+        return render_template('index.html',
+                                errores=errores,
+                                vista="",
+                                usuarios=[],  # listas vacías
+                                administradores=[],
+                                semillas=[],
+                                tutoriales=[])
+
+    finally:
+        cursor.close()
+        session.pop("vista_activa", None)
+        session.pop("errores", None)
+        session.pop("sobreescribirSemilla", None)
+        
+@app.route('/actualizar_tutorial', methods=['POST'])
+def actualizarTutorial():
+    errores= {}
+    idUpdate = request.form.get('idTutorial', '').strip()
+    nnombre = request.form.get('nnombre_video', '').strip()
+    ndescripcion = request.form.get('ndescripcion_video', '').strip()
+    nURL = request.form.get('nURL_video', '').strip()
+    
+    
+    
+    if not nnombre:
+        errores['nnombre_video'] = 'Nombre del video Obligatorio'
+        
+    if not ndescripcion:
+        errores['ndescripcion_video'] = 'Descripción del video es obligatoria'
+    
+    if not nURL:
+        errores['nURL_video'] = 'Necesitas ingresar una URL'
+    
+    
+
+    if not errores:
+        try:
+            cursor= mysql.connection.cursor()
+            cursor.execute('update videos set Nombre = %s, Descripción = %s, URL = %s where Clave_video = %s',(nnombre, ndescripcion, nURL, idUpdate))
+            mysql.connection.commit()
+            flash('Tutorial actuzalizado correctamente')
+            return redirect(url_for('Inicio'))
+        
+        except Exception as e:
+            mysql.connection.rollback() 
+            flash('Algo fallo:'+str(e))
+            return  redirect(url_for('Inicio'))
+        
+        finally:
+            cursor.close()
+            
+@app.route('/eliminar_tutorial/<int:id>', methods=['POST'])
+def eliminarTutorial(id):
+    
+    try:
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute('UPDATE videos SET estado = 0 WHERE Clave_video = %s', (id,))
+        mysql.connection.commit()
+        flash('Tutorial eliminado correctamente')
+        return redirect(url_for('Inicio'))
+        
+    except Exception as e:
+        mysql.connection.rollback()
+        flash('Error al eliminar: '+ str(e))
+        return render_template('index.html')
+    finally:
+        cursor.close()
+
+
 
 if __name__ == '__main__':
     app.run(port=3000, debug=True)

@@ -190,6 +190,7 @@
     <!-- Sección de formularios -->
 
     <!-- Gestión de Usuarios -->
+    <!-- Agregar Usuarios-->
     <div id="usuarios" class="dashboard-section">
       <h3 class="mt-5">Gestión de Usuarios</h3>
 
@@ -227,6 +228,10 @@
         </div>
       </form>
 
+      
+
+      
+
       <table class="table table-bordered">
         <thead>
           <tr>
@@ -237,20 +242,27 @@
             <th>Acciones</th>
           </tr>
         </thead>
-        <tbody>
-          {% for u in usuarios %}
-            <tr>
-              <td>{{u.0}}</td>
-              <td>{{u.1}}</td>
-              <td>{{u.2}}</td>
-              <td>{{u.4}}</td>
-              <td class="action-buttons">
-                <button class="btn btn-warning btn-sm">Editar</button>
-                <button class="btn btn-danger btn-sm">Eliminar</button>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
+        
+          <tbody>
+            {% for u in usuarios %}
+              <tr>
+                <td>{{u.0}}</td>
+                <td>{{u.1}}</td>
+                <td>{{u.2}}</td>
+                <td>{{u.4}}</td>
+                <td class="action-buttons">
+                  <form action="/modificar_usuario/{{u.0}}">
+                    <button class="btn btn-warning btn-sm" type="submit" >Editar</button>
+                  </form>
+
+                  <form action="/eliminar_usuario/{{u.0}}" method="post">
+                    <button class="btn btn-danger btn-sm">Eliminar</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+      
       </table>
     </div>
 
@@ -303,8 +315,12 @@
               <td>{{admin.2}}</td>
               <td>{{admin.4}}</td>
               <td class="action-buttons">
+                <form action="/modificar_admin/{{admin.0}}">
                 <button class="btn btn-warning btn-sm">Editar</button>
-                <button class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+                <form action="/eliminar_admin/{{admin.0}}" method="post">
+                    <button class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
               </td>
             </tr>
           {% endfor %}
@@ -316,9 +332,9 @@
     <div id="semillas" class="dashboard-section">
       <h3 class="mt-5">Gestión de Semillas</h3>
 
-      <form class="row g-3 mt-3 mb-4" action="/guardarSemilla" method="POST">
+      <form class="row g-3 mt-3 mb-4" action="/agregar_semilla" method="POST">
         <div class="col-md-3">
-          <input type="text" class="form-control" placeholder="Nombre" name="nombre_semilla" required>
+          <input type="text" class="form-control" placeholder="Nombre" name="nombre_semilla" value="{{request.form.nombre_semilla}}">
           {% if errores and errores.nombre_semilla %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.nombre_semilla }}
@@ -327,7 +343,7 @@
         </div>
 
         <div class="col-md-3">
-          <input type="text" class="form-control" placeholder="Espacio" name="espacio" required>
+          <input type="text" class="form-control" placeholder="Espacio" name="espacio" value="{{request.form.espacio}}">
           {% if errores and errores.espacio %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.espacio }}
@@ -336,7 +352,7 @@
         </div>
 
         <div class="col-md-2">
-          <input type="url" class="form-control" placeholder="URL Imagen" name="imagen_semilla" required>
+          <input type="text" class="form-control" placeholder="URL Imagen" name="imagen_semilla" value="{{request.form.imagen_semilla}}">
           {% if errores and errores.imagen_semilla %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.imagen_semilla }}
@@ -345,7 +361,7 @@
         </div>
 
         <div class="col-md-2">
-          <input type="text" class="form-control" placeholder="Clave Vitamina" name="vitamina" required>
+          <input type="text" class="form-control" placeholder="Clave Vitamina" name="vitamina" value="{{request.form.vitamina}}">
           {% if errores and errores.vitamina %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.vitamina }}
@@ -354,7 +370,7 @@
         </div>
 
         <div class="col-md-2">
-          <input type="text" class="form-control" placeholder="Clave Municipio" name="municipio" required>
+          <input type="text" class="form-control" placeholder="Clave Municipio" name="municipio" value="{{request.form.municipio}}">
           {% if errores and errores.municipio %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.municipio }}
@@ -363,7 +379,7 @@
         </div>
 
         <div class="col-md-2">
-          <input type="text" class="form-control" placeholder="Clave Tipo" name="tipo_semilla" required>
+          <input type="text" class="form-control" placeholder="Clave Tipo" name="tipo_semilla" value="{{request.form.tipo_semilla}}">
           {% if errores and errores.tipo_semilla %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.tipo_semilla }}
@@ -372,7 +388,7 @@
         </div>
 
         <div class="col-md-3">
-          <input type="text" class="form-control" placeholder="Clave Fertilizante" name="fertilizante" required>
+          <input type="text" class="form-control" placeholder="Clave Fertilizante" name="fertilizante" value="{{request.form.fertilizante}}">
           {% if errores and errores.fertilizante %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.fertilizante }}
@@ -409,8 +425,13 @@
               <td>{{sem.5}}</td>
               <td>{{sem.6}}</td>
               <td class="action-buttons">
-                <button class="btn btn-warning btn-sm">Editar</button>
-                <button class="btn btn-danger btn-sm">Eliminar</button>
+
+                <form action="/modificar_semilla/{{sem.0}}">
+                <button class="btn btn-warning btn-sm" type="submit">Editar</button>
+                </form>
+                <form action="/eliminar_semilla/{{sem.0}}" method="post">
+                    <button class="btn btn-danger btn-sm">Eliminar</button>
+                  </form>
               </td>
             </tr>
           {% endfor %}
@@ -424,7 +445,7 @@
 
       <form class="row g-3 mt-3 mb-4" action="/guardarTutorial" method="POST">
         <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Nombre del vídeo" name="nombre_video" required>
+          <input type="text" class="form-control" placeholder="Nombre del vídeo" name="nombre_video" value="{{request.form.nombre_video}}">
           {% if errores and errores.nombre_video %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.nombre_video }}
@@ -433,7 +454,7 @@
         </div>
 
         <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Descripción" name="descripcion_video" required>
+          <input type="text" class="form-control" placeholder="Descripción" name="descripcion_video" value="{{request.form.descripcion_video}}">
           {% if errores and errores.descripcion_video %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.descripcion_video }}
@@ -442,7 +463,7 @@
         </div>
 
         <div class="col-md-3">
-          <input type="url" class="form-control" placeholder="URL" name="URL_video" required>
+          <input type="url" class="form-control" placeholder="URL" name="URL_video" value="{{request.form.URL_video}}">
           {% if errores and errores.URL_video %}
             <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
               {{ errores.URL_video }}
@@ -473,8 +494,14 @@
               <td>{{tuto.2}}</td>
               <td><a href="{{tuto.3}}" target="_blank">{{tuto.3}}</a></td>
               <td class="action-buttons">
-                <button class="btn btn-warning btn-sm">Editar</button>
-                <button class="btn btn-danger btn-sm">Eliminar</button>
+
+                <form action="/modificar_tutorial/{{tuto.0}}">
+                  <button class="btn btn-warning btn-sm" type="submit">Editar</button>
+                </form>
+                
+                <form action="/eliminar_tutorial/{{tuto.0}}" method="post">
+                    <button class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
               </td>
             </tr>
           {% endfor %}
@@ -486,206 +513,12 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
-  <table class="table table-bordered">
-    <thead>
-
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Correo</th>
-        <th>Cargo</th>
-        <th>Acciones</th>
-      </tr>
-
-    </thead>
-
-    <tbody>
-      {% for admin in administradores%}
-        <tr>
-          <td>{{admin.0}}</td>
-          <td>{{admin.1}}</td>
-          <td>{{admin.2}}</td>
-          <td>{{admin.4}}</td>
-          <td class="action-buttons">
-            <button class="btn btn-warning btn-sm">Editar</button>
-            <button class="btn btn-danger btn-sm">Eliminar</button>
-          </td>
-        </tr>
-      {% endfor%}
-    </tbody>
-  </table>
-</div>
-
-
-
-
-<!-- Gestión de Semillas -->
-
-<div id="semillas" class="dashboard-section">
-  <h3 class="mt-5">Gestión de Semillas</h3>
-
-  <form class="row g-3 mt-3 mb-4" enctype="multipart/form-data" action="{{ url_for('agregarSemilla') }}" method="POST">
-
-    <div class="col-md-3">
-      <input type="text" class="form-control" placeholder="Nombre" name="nombre_semilla" required >
-    </div>
-
-    <div class="col-md-3">
-      <input type="text" class="form-control" placeholder="Espacio" name="espacio" required >
-    </div>
-
-    <div class="col-md-2">
-      <input type="text" class="form-control" placeholder="URL Imagen" name="imagen_semilla" required>
-    </div>
-
-    
-
-    <div class="col-md-2">
-      <input type="text" class="form-control" placeholder="Clave Vitamina" name="vitamina" required>
-    </div>
-
-    
-
-    <div class="col-md-2">
-      <input type="text" class="form-control" placeholder="Clave Municipio" name="municipio" required>
-    </div>
-
-    
-
-    <div class="col-md-2">
-      <input type="text" class="form-control" placeholder="Clave Tipo" name="tipo_semilla" required>
-    </div>
-
-    
-
-    <div class="col-md-3">
-      <input type="text" class="form-control" placeholder="Clave Fertilizante" name="fertilizante" required>
-    </div>
-
-    
-
-    <div class="col-12">
-      <button type="submit" class="btn btn-success">Agregar Semilla</button>
-    </div>
-  </form>
-
-  <form id="sobreescribirS" action="/sobreescribir_semilla" method="POST"></form>
-
-  <table class="table table-bordered table-hover">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Imagen</th>
-        <th>Espacio</th>
-        <th>Imagen_URL</th>
-        <th>Clave_Vitamina</th>
-        <th>Clave_Municipio</th>
-        <th>Clave_Tipo</th>
-        <th>Clave_Fertilizantes</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for sem in semillas %}
-        <tr>
-          <td>{{sem.0}}</td>
-          <td>{{sem.1}}</td>
-          <td><img src="{{sem.3}}" alt="Imagen de {{sem.1}}"></td>
-          <td>{{sem.2}}</td>
-          <td>{{sem.3}}</td>
-          <td>{{sem.4}}</td>
-          <td>{{sem.5}}</td>
-          <td>{{sem.6}}</td>
-          <td>{{sem.7}}</td>
-          <td class="action-buttons">
-            <button class="btn btn-warning btn-sm">Editar</button>
-            <button class="btn btn-danger btn-sm">Eliminar</button>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
-<!-- Tutoriales Activos -->
-
-<div id="tutoriales" class="dashboard-section">
-  <h3 class="mt-5">Tutoriales Activos</h3>
-
-  <form class="row g-3 mt-3 mb-4" action="/guardarTutorial" method="POST">
-    
   
 
-    <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Nombre del vídeo" name="nombre_video" required>
 
-      {% if errores and errores.nombre_video %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.nombre_video }}
-        </div>
-      {% endif %}
 
-    </div>
 
-    <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Descripción" name="descripcion_video" required>
 
-      {% if errores and errores.descripcion_video %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.descripcion_video }}
-        </div>
-      {% endif %}
-
-    </div>
-
-    <div class="col-md-3">
-      <input type="text" class="form-control" placeholder="URL" name="URL_video" required>
-
-      {% if errores and errores.URL_video %}
-        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-          {{ errores.URL_video }}
-        </div>
-      {% endif %}
-
-    </div>
-
-    <div class="col-12">
-      <button type="submit" class="btn btn-success">Agregar Tutorial</button>
-
-    </div>
-
-  </form>
-
-  
-  <table class="table table-bordered">
-    
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Título</th>
-        <th>Descripción</th>
-        <th>URL</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      {% for tuto in tutoriales %}
-        <tr>
-          <td>{{tuto.0}}</td>
-          <td>{{tuto.1}}</td>
-          <td>{{tuto.2}}</td>
-          <td><a href="{{tuto.3}}">{{tuto.3}}</a></td>
-          <td class="action-buttons">
-            <button class="btn btn-warning btn-sm">Editar</button>
-            <button class="btn btn-danger btn-sm">Eliminar</button>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
 
 
   <script>
