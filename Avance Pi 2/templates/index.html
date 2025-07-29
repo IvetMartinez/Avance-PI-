@@ -95,43 +95,43 @@
     <h1 class="mb-4 text-center">Inicio</h1>
     
     <!-- Tarjetas del Dashboard -->
-    <div class="row g-4 text-center">
-      <div class="col-md-3">
-        <div class="card gradient-border" onclick="Vista('usuarios')">
-          <div class="card-body">
-            <h5 class="card-title">Usuarios Registrados</h5>
-            <p class="card-text fs-4">1</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-md-3">
-        <div class="card gradient-border" onclick="Vista('admins')">
-          <div class="card-body">
-            <h5 class="card-title">Administradores Activos</h5>
-            <p class="card-text fs-4">15</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-md-3">
-        <div class="card gradient-border" onclick="Vista('semillas')">
-          <div class="card-body">
-            <h5 class="card-title">Semillas Cargadas</h5>
-            <p class="card-text fs-4">78</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-md-3">
-        <div class="card gradient-border" onclick="Vista('tutoriales')">
-          <div class="card-body">
-            <h5 class="card-title">Tutoriales Activos</h5>
-            <p class="card-text fs-4">12</p>
-          </div>
-        </div>
+<div class="row g-4 text-center">
+  <div class="col-md-3">
+    <div class="card gradient-border" onclick="Vista('usuarios')">
+      <div class="card-body">
+        <h5 class="card-title">Usuarios Registrados</h5>
+        <p class="card-text fs-4">{{ total_usuarios }}</p>
       </div>
     </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="card gradient-border" onclick="Vista('admins')">
+      <div class="card-body">
+        <h5 class="card-title">Administradores Activos</h5>
+        <p class="card-text fs-4">{{ total_administradores }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="card gradient-border" onclick="Vista('semillas')">
+      <div class="card-body">
+        <h5 class="card-title">Semillas Cargadas</h5>
+        <p class="card-text fs-4">{{ total_semillas }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="card gradient-border" onclick="Vista('tutoriales')">
+      <div class="card-body">
+        <h5 class="card-title">Tutoriales Activos</h5>
+        <p class="card-text fs-4">{{ total_tutoriales }}</p>
+      </div>
+    </div>
+  </div>
+</div>
 
     {% with mensajes = get_flashed_messages() %}
       {% if mensajes %}
@@ -329,115 +329,153 @@
     </div>
 
     <!-- Gestión de Semillas -->
-    <div id="semillas" class="dashboard-section">
-      <h3 class="mt-5">Gestión de Semillas</h3>
+<div id="semillas" class="dashboard-section">
+  <h3 class="mt-5">Gestión de Semillas</h3>
 
-      <form class="row g-3 mt-3 mb-4" action="/agregar_semilla" method="POST">
-        <div class="col-md-3">
-          <input type="text" class="form-control" placeholder="Nombre" name="nombre_semilla" value="{{request.form.nombre_semilla}}">
-          {% if errores and errores.nombre_semilla %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.nombre_semilla }}
-            </div>
-          {% endif %}
+  <form class="row g-3 mt-3 mb-4" action="/agregar_semilla" method="POST">
+    <div class="col-md-3">
+      <input type="text" class="form-control" placeholder="Nombre" name="nombre_semilla" value="{{request.form.nombre_semilla}}">
+      {% if errores and errores.nombre_semilla %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.nombre_semilla }}
         </div>
-
-        <div class="col-md-3">
-          <input type="text" class="form-control" placeholder="Espacio" name="espacio" value="{{request.form.espacio}}">
-          {% if errores and errores.espacio %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.espacio }}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="col-md-2">
-          <input type="text" class="form-control" placeholder="URL Imagen" name="imagen_semilla" value="{{request.form.imagen_semilla}}">
-          {% if errores and errores.imagen_semilla %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.imagen_semilla }}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="col-md-2">
-          <input type="text" class="form-control" placeholder="Clave Vitamina" name="vitamina" value="{{request.form.vitamina}}">
-          {% if errores and errores.vitamina %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.vitamina }}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="col-md-2">
-          <input type="text" class="form-control" placeholder="Clave Municipio" name="municipio" value="{{request.form.municipio}}">
-          {% if errores and errores.municipio %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.municipio }}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="col-md-2">
-          <input type="text" class="form-control" placeholder="Clave Tipo" name="tipo_semilla" value="{{request.form.tipo_semilla}}">
-          {% if errores and errores.tipo_semilla %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.tipo_semilla }}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="col-md-3">
-          <input type="text" class="form-control" placeholder="Clave Fertilizante" name="fertilizante" value="{{request.form.fertilizante}}">
-          {% if errores and errores.fertilizante %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.fertilizante }}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="col-12">
-          <button type="submit" class="btn btn-success">Agregar Semilla</button>
-        </div>
-      </form>
-
-      <table class="table table-bordered table-hover">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Espacio</th>
-            <th>Imagen</th>
-            <th>Clave_Municipio</th>
-            <th>Clave_Tipo</th>
-            <th>Clave_Fertilizante</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for sem in semillas %}
-            <tr>
-              <td>{{sem.0}}</td>
-              <td>{{sem.1}}</td>
-              <td>{{sem.2}}</td>
-              <td><img src="{{sem.3}}" alt="{{sem.1}}" style="width: 50px; height: 50px; object-fit: cover;"></td>
-              <td>{{sem.4}}</td>
-              <td>{{sem.5}}</td>
-              <td>{{sem.6}}</td>
-              <td class="action-buttons">
-
-                <form action="/modificar_semilla/{{sem.0}}">
-                <button class="btn btn-warning btn-sm" type="submit">Editar</button>
-                </form>
-                <form action="/eliminar_semilla/{{sem.0}}" method="post">
-                    <button class="btn btn-danger btn-sm">Eliminar</button>
-                  </form>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      {% endif %}
     </div>
+
+    <div class="col-md-3">
+      <input type="text" class="form-control" placeholder="Espacio" name="espacio" value="{{request.form.espacio}}">
+      {% if errores and errores.espacio %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.espacio }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="col-md-6">
+      <input type="text" class="form-control" placeholder="URL Imagen" name="imagen_semilla" value="{{request.form.imagen_semilla}}">
+      {% if errores and errores.imagen_semilla %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.imagen_semilla }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- SELECT PARA VITAMINAS -->
+    <div class="col-md-3">
+      <select class="form-select" name="vitamina" required>
+        <option value="">Seleccionar Vitamina</option>
+        {% for vitamina in vitaminas %}
+          <option value="{{ vitamina.0 }}" 
+                  {% if request.form.vitamina == vitamina.0|string %}selected{% endif %}>
+            {{ vitamina.1 }}
+          </option>
+        {% endfor %}
+      </select>
+      {% if errores and errores.vitamina %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.vitamina }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- SELECT PARA MUNICIPIOS -->
+    <div class="col-md-3">
+      <select class="form-select" name="municipio" required>
+        <option value="">Seleccionar Municipio</option>
+        {% for municipio in municipios %}
+          <option value="{{ municipio.0 }}" 
+                  {% if request.form.municipio == municipio.0|string %}selected{% endif %}>
+            {{ municipio.1 }}
+          </option>
+        {% endfor %}
+      </select>
+      {% if errores and errores.municipio %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.municipio }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- SELECT PARA TIPO DE SEMILLA -->
+    <div class="col-md-3">
+      <select class="form-select" name="tipo_semilla" required>
+        <option value="">Seleccionar Tipo</option>
+        {% for tipo in tipos_semilla %}
+          <option value="{{ tipo.0 }}" 
+                  {% if request.form.tipo_semilla == tipo.0|string %}selected{% endif %}>
+            {{ tipo.1 }}
+          </option>
+        {% endfor %}
+      </select>
+      {% if errores and errores.tipo_semilla %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.tipo_semilla }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- SELECT PARA FERTILIZANTES -->
+    <div class="col-md-3">
+      <select class="form-select" name="fertilizante" required>
+        <option value="">Seleccionar Fertilizante</option>
+        {% for fertilizante in fertilizantes %}
+          <option value="{{ fertilizante.0 }}" 
+                  {% if request.form.fertilizante == fertilizante.0|string %}selected{% endif %}>
+            {{ fertilizante.1 }}
+          </option>
+        {% endfor %}
+      </select>
+      {% if errores and errores.fertilizante %}
+        <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+          {{ errores.fertilizante }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="col-12">
+      <button type="submit" class="btn btn-success">Agregar Semilla</button>
+    </div>
+  </form>
+
+  <!-- TABLA ACTUALIZADA PARA MOSTRAR NOMBRES EN LUGAR DE CLAVES -->
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Espacio</th>
+        <th>Imagen</th>
+        <th>Vitamina</th>
+        <th>Municipio</th>
+        <th>Tipo</th>
+        <th>Fertilizante</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sem in semillas %}
+        <tr>
+          <td>{{sem.0}}</td>
+          <td>{{sem.1}}</td>
+          <td>{{sem.2}}</td>
+          <td><img src="{{ url_for('static', filename=sem.3) }}" alt="{{sem.1}}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"></td>
+          <td>{{sem.4}}</td>
+          <td>{{sem.5}}</td>
+          <td>{{sem.6}}</td>
+          <td>{{sem.7}}</td>
+          <td class="action-buttons">
+            <form action="/modificar_semilla/{{sem.0}}">
+              <button class="btn btn-warning btn-sm" type="submit">Editar</button>
+            </form>
+            <form action="/eliminar_semilla/{{sem.0}}" method="post">
+              <button class="btn btn-danger btn-sm">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
     <!-- Tutoriales Activos -->
     <div id="tutoriales" class="dashboard-section">

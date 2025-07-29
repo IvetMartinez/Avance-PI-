@@ -64,6 +64,22 @@ def Inicio():
         # Inicio del cursor
         cursor = mysql.connection.cursor()
         
+        # Contador de Usuarios Activos
+        cursor.execute('SELECT COUNT(*) FROM usuarios WHERE estado = 1')
+        contador_usuarios = cursor.fetchone()[0]
+        
+        # Contador de Administradores Activos
+        cursor.execute('SELECT COUNT(*) FROM administradores WHERE estado = 1')
+        contador_administradores = cursor.fetchone()[0]
+        
+        # Contador de Semillas Activas
+        cursor.execute('SELECT COUNT(*) FROM semillas WHERE estado = 1')
+        contador_semillas = cursor.fetchone()[0]
+        
+        # Contador de Tutoriales/Videos Activos
+        cursor.execute('SELECT COUNT(*) FROM videos WHERE estado = 1')
+        contador_tutoriales = cursor.fetchone()[0]
+        
         # Consulta de Usuarios
         cursor.execute('SELECT * FROM usuarios where estado = 1')
         consultaUsuarios = cursor.fetchall()
@@ -73,20 +89,62 @@ def Inicio():
         consultaAdministradores = cursor.fetchall()
         
         # Consulta de Semillas
-        cursor.execute('SELECT * FROM semillas where estado = 1')
+        cursor.execute('''
+            SELECT 
+                s.Clave_semilla,
+                s.Nombre,
+                s.Espacio,
+                s.Imagen_URL,
+                v.Nombre as Vitamina,
+                m.Nombre as Municipio,
+                ts.Nombre as Tipo_Semilla,
+                f.Nombre as Fertilizante
+            FROM semillas s
+            LEFT JOIN Vitaminas v ON s.Clave_Vitamina = v.Clave_vitamina
+            LEFT JOIN Municipios m ON s.Clave_municipio = m.Clave_municipio
+            LEFT JOIN Tipo_semilla ts ON s.Clave_tipo = ts.Idtiposemilla
+            LEFT JOIN Fertilizantes f ON s.Clave_fertilizante = f.Clave_fertilizante
+            WHERE s.estado = 1
+            ORDER BY s.Nombre
+        ''')
         consultaSemillas = cursor.fetchall()
-        
         # Consulta de Tutoriales
         cursor.execute('SELECT * FROM videos where estado = 1')
         consultaTutoriales = cursor.fetchall()
+        # Consulta de Vitaminas
+        cursor.execute('SELECT Clave_vitamina, Nombre FROM Vitaminas ORDER BY Nombre')
+        consultaVitaminas = cursor.fetchall()
+        
+        # Consulta de Municipios
+        cursor.execute('SELECT Clave_municipio, Nombre FROM Municipios ORDER BY Nombre')
+        consultaMunicipios = cursor.fetchall()
+        
+        # Consulta de Tipos de Semilla
+        cursor.execute('SELECT Idtiposemilla, Nombre FROM Tipo_semilla ORDER BY Nombre')
+        consultaTiposSemilla = cursor.fetchall()
+        
+        # Consulta de Fertilizantes
+        cursor.execute('SELECT Clave_fertilizante, Nombre FROM Fertilizantes ORDER BY Nombre')
+        consultaFertilizantes = cursor.fetchall()
 
         return render_template('index.html', 
                                 errores=errores,
                                 vista=vista,
+                                # CONTADORES PARA EL DASHBOARD
+                                total_usuarios = contador_usuarios,
+                                total_administradores = contador_administradores,
+                                total_semillas = contador_semillas,
+                                total_tutoriales = contador_tutoriales,
+                                # DATOS PARA LAS TABLAS
                                 usuarios = consultaUsuarios,
                                 administradores = consultaAdministradores, 
                                 semillas = consultaSemillas, 
-                                tutoriales = consultaTutoriales)
+                                tutoriales = consultaTutoriales,
+                                # DATOS PARA LOS SELECT
+                                vitaminas = consultaVitaminas,
+                                municipios = consultaMunicipios,
+                                tipos_semilla = consultaTiposSemilla,
+                                fertilizantes = consultaFertilizantes)
         
     except Exception as e:
         # Aquí convertimos 'e' a cadena antes de usarlo
@@ -97,10 +155,21 @@ def Inicio():
         return render_template('index.html',
                                 errores=errores,
                                 vista="",
-                                usuarios=[],  # listas vacías
+                                # Contadores en 0 cuando hay error
+                                total_usuarios = 0,
+                                total_administradores = 0,
+                                total_semillas = 0,
+                                total_tutoriales = 0,
+                                # Listas vacías
+                                usuarios=[],
                                 administradores=[],
                                 semillas=[],
-                                tutoriales=[])
+                                tutoriales=[],
+                                # Variables vacías para los select
+                                vitaminas=[],
+                                municipios=[],
+                                tipos_semilla=[],
+                                fertilizantes=[])
 
     finally:
         cursor.close()
@@ -432,11 +501,32 @@ def agregarSemilla():
 def modificarSemilla(id):
     
     try:
-        
         cursor = mysql.connection.cursor()
+        
+        # Consulta de la semilla específica
         cursor.execute('select * from semillas where Clave_semilla = %s', (id,))
         nSemilla = cursor.fetchone()
-        return render_template('modificar_semilla.html', nSemilla = nSemilla, errores = {})
+        
+        # Consultas para los select (mismas que en la ruta principal)
+        cursor.execute('SELECT Clave_vitamina, Nombre FROM Vitaminas ORDER BY Nombre')
+        consultaVitaminas = cursor.fetchall()
+        
+        cursor.execute('SELECT Clave_municipio, Nombre FROM Municipios ORDER BY Nombre')
+        consultaMunicipios = cursor.fetchall()
+        
+        cursor.execute('SELECT Idtiposemilla, Nombre FROM Tipo_semilla ORDER BY Nombre')
+        consultaTiposSemilla = cursor.fetchall()
+        
+        cursor.execute('SELECT Clave_fertilizante, Nombre FROM Fertilizantes ORDER BY Nombre')
+        consultaFertilizantes = cursor.fetchall()
+        
+        return render_template('modificar_semilla.html', 
+                                nSemilla = nSemilla, 
+                                errores = {},
+                                vitaminas = consultaVitaminas,
+                                municipios = consultaMunicipios,
+                                tipos_semilla = consultaTiposSemilla,
+                                fertilizantes = consultaFertilizantes)
         
     except Exception as e:
         mysql.connection.rollback() 

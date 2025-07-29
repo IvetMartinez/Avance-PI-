@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,49 +7,94 @@
     <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     rel="stylesheet"/>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .dashboard-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .btn-back {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            color: white;
+        }
+    </style>
 </head>
 <body>
+
+    <div class="dashboard-section">
+        <h3 class="mt-2 mb-4">Modificar Tutorial</h3>
+
+        <form class="row g-3 mt-3 mb-4" action="/actualizar_tutorial" method="POST">
+            <!-- Campo oculto con el ID del tutorial -->
+            <input type="hidden" name="idTutorial" value="{{nTuto.0}}">
+            
+            <!-- Nombre del video -->
+            <div class="col-md-4">
+                <label for="nnombre_video" class="form-label">Nombre del Video</label>
+                <input type="text" class="form-control" id="nnombre_video" name="nnombre_video" value="{{nTuto.1}}" required>
+                {% if errores and errores.nnombre_video %}
+                    <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+                        {{ errores.nnombre_video }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Descripción del video -->
+            <div class="col-md-4">
+                <label for="ndescripcion_video" class="form-label">Descripción</label>
+                <input type="text" class="form-control" id="ndescripcion_video" name="ndescripcion_video" value="{{nTuto.2}}" required>
+                {% if errores and errores.ndescripcion_video %}
+                    <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+                        {{ errores.ndescripcion_video }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- URL del video -->
+            <div class="col-md-4">
+                <label for="nURL_video" class="form-label">URL del Video</label>
+                <input type="url" class="form-control" id="nURL_video" name="nURL_video" value="{{nTuto.3}}" required>
+                {% if errores and errores.nURL_video %}
+                    <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
+                        {{ errores.nURL_video }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-success me-3">
+                    <i class="bi bi-check-circle"></i> Modificar Tutorial
+                </button>
+                <a href="/" class="btn btn-back">
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </a>
+            </div>
+        </form>
+
+    </div>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     
-
-    <h3 class="mt-5">Modificar Tutorial</h3>
-
-      <form class="row g-3 mt-3 mb-4" action="/actualizar_tutorial" method="POST">
-
-<input type="hidden" name="idTutorial" value="{{nTuto.0}}">
-
-        <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Nombre del vídeo" name="nnombre_video" value="{{nTuto.1}}">
-          {% if errores and errores.nnombre_video %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.nnombre_video }}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Descripción" name="ndescripcion_video" value="{{nTuto.2}}">
-          {% if errores and errores.ndescripcion_video %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.ndescripcion_video }}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="col-md-3">
-          <input type="url" class="form-control" placeholder="URL" name="nURL_video" value="{{nTuto.3}}">
-          {% if errores and errores.nURL_video %}
-            <div class="alert alert-danger mt-2 py-2 px-3" role="alert">
-              {{ errores.nURL_video }}
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="col-12">
-          <button type="submit" class="btn btn-success">Modificar Tutorial</button>
-          <form action="/"><button>Regresar</button></form>
-        </div>
-      </form>
-
-
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
 </body>
 </html>
